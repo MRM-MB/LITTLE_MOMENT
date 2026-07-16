@@ -94,3 +94,68 @@ footer { border-top: 1px solid var(--ink); padding-top: 15px; }
   .preview-stage { order: 1; }
   .frame { width: min(350px, 80vw); }
 }
+
+/* The card remains the artwork; controls deliberately stay secondary to it. */
+body {
+  padding: 36px;
+  color: #222;
+  background: #ececec;
+  font-family: "Gochi Hand", cursive;
+  -webkit-font-smoothing: antialiased;
+}
+
+body > svg { width: 0; height: 0; position: absolute; }
+.app-shell { width: min(940px, 100%); padding: 0; }
+.workspace { grid-template-columns: minmax(250px, 320px) minmax(280px, 360px); justify-content: center; gap: clamp(56px, 10vw, 130px); min-height: 100vh; }
+.controls-panel { font-family: "Gochi Hand", cursive; }
+.control-heading, .control-group > label, .label-row, .hint, .export-button { font-family: "Gochi Hand", cursive; letter-spacing: 0; text-transform: none; }
+.control-heading, .control-group > label, .label-row { font-size: 18px; }
+.upload-button, .emoji-chip { font-family: "Gochi Hand", cursive; box-shadow: none; }
+.upload-button { padding: 8px 11px; }
+.upload-button:hover { transform: none; box-shadow: none; }
+.control-group { border-color: #b8b8b8; }
+textarea { font-size: 28px; }
+.hint { font-size: 15px; }
+.export-button { box-shadow: none; font-size: 20px; text-transform: none; }
+.export-button:hover { transform: none; box-shadow: none; }
+
+.preview-stage { display: block; }
+.frame {
+  flex-shrink: 0;
+  width: clamp(280px, 30vw, 360px);
+  aspect-ratio: 4 / 5;
+  padding: 24px;
+  transform: rotate(-6deg);
+  background-color: #f9f7f5;
+  box-shadow: 2px 2px 12px #0003;
+}
+.photo-wrap { aspect-ratio: 1 / 1; overflow: visible; background: transparent; }
+.photo-wrap::after { box-shadow: inset 2px 2px 4px #0007, inset -1px -1px 4px #0003; }
+#preview-image { filter: contrast(1.2) brightness(.9); }
+.quote-preview { margin: 0; padding-top: 30px; font-size: clamp(28px, 3vw, 36px); min-height: 0; }
+.emoji-layer { filter: url('#noise'); font-family: "Noto Emoji", sans-serif; font-size: clamp(60px, 6.5vw, 80px); }
+.emoji {
+  display: block;
+  width: auto;
+  height: auto;
+  border: 0;
+  background: transparent;
+  font-family: "Noto Emoji", sans-serif;
+  font-size: 1em;
+}
+.emoji.selected { outline: 1px dashed #222; background: transparent; }
+.emoji-0 { font-size: .7em; transform: rotate(-10deg); }
+.emoji-1 { font-size: 1.2em; }
+.emoji-2 { font-size: 1.2em; transform: rotate(-10deg); }
+.emoji-3 { font-size: .7em; transform: rotate(10deg); }
+.emoji-4 { transform: rotate(15deg); }
+.emoji-5 { font-size: .32em; font-weight: bold; letter-spacing: -12px; }
+.emoji-6 { font-size: .7em; transform: rotate(-5deg); }
+.emoji-7 { font-size: .8em; }
+
+@media (max-width: 760px) {
+  body { padding: 28px 20px; }
+  .workspace { grid-template-columns: 1fr; gap: 66px; padding: 38px 0; }
+  .preview-stage { order: 1; justify-self: center; }
+  .controls-panel { order: 2; }
+}

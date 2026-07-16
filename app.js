@@ -1,5 +1,15 @@
 const MAX_EMOJIS = 8;
 const EXPORT_SCALE = 3;
+const STARTING_POSITIONS = [
+  { x: -6, y: -6 },
+  { x: 10, y: 10 },
+  { x: -15, y: 50 },
+  { x: 85, y: 25 },
+  { x: 85, y: -5 },
+  { x: 5, y: 77 },
+  { x: 5, y: 88 },
+  { x: 89, y: 89 },
+];
 
 const state = {
   imageUrl: null,
@@ -61,11 +71,12 @@ function addEmoji() {
   const emoji = emojiInput.value.trim();
   if (!emoji || state.emojis.length >= MAX_EMOJIS) return;
 
+  const position = STARTING_POSITIONS[state.emojis.length];
   state.emojis.push({
     id: crypto.randomUUID(),
     value: emoji,
-    x: 18 + ((state.emojis.length * 19) % 66),
-    y: 4 + ((state.emojis.length * 23) % 81),
+    x: position.x,
+    y: position.y,
   });
   emojiInput.value = '';
   renderEmojis();
@@ -85,7 +96,7 @@ function renderEmojis() {
 
   for (const emoji of state.emojis) {
     const element = document.createElement('span');
-    element.className = `emoji${emoji.id === state.selectedEmojiId ? ' selected' : ''}`;
+    element.className = `emoji emoji-${state.emojis.indexOf(emoji)}${emoji.id === state.selectedEmojiId ? ' selected' : ''}`;
     element.textContent = emoji.value;
     element.style.left = `${emoji.x}%`;
     element.style.top = `${emoji.y}%`;
@@ -185,10 +196,14 @@ async function exportPng() {
 
     context.textAlign = 'center';
     context.textBaseline = 'middle';
-    context.font = '52px "Apple Color Emoji", "Segoe UI Emoji", "Noto Color Emoji"';
-    for (const emoji of state.emojis) {
-      context.fillText(emoji.value, (emoji.x / 100) * width + 30, (emoji.y / 100) * height + 30);
-    }
+    context.font = '52px "Noto Emoji", "Apple Color Emoji", "Segoe UI Emoji", sans-serif';
+    state.emojis.forEach((emoji, index) => {
+      context.save();
+      context.translate((emoji.x / 100) * width + 30, (emoji.y / 100) * height + 30);
+      context.rotate(([-10, 0, -10, 10, 15, 0, -5, 0][index] * Math.PI) / 180);
+      context.fillText(emoji.value, 0, 0);
+      context.restore();
+    });
 
     const png = await new Promise((resolve) => canvas.toBlob(resolve, 'image/png'));
     if (!png) throw new Error('PNG creation failed');

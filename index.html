@@ -7,16 +7,19 @@
     <title>Little Frame</title>
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Gochi+Hand&display=swap" rel="stylesheet" />
+    <link href="https://fonts.googleapis.com/css2?family=Gochi+Hand&family=Noto+Emoji:wght@300..700&display=swap" rel="stylesheet" />
     <link rel="stylesheet" href="styles.css" />
   </head>
   <body>
+    <svg aria-hidden="true" focusable="false">
+      <filter id="noise">
+        <feTurbulence baseFrequency="0.02" numOctaves="3" result="noise" seed="0">
+          <animate attributeName="seed" values="1;2;3;4" dur="0.5s" calcMode="discrete" repeatCount="indefinite" />
+        </feTurbulence>
+        <feDisplacementMap in="SourceGraphic" in2="noise" scale="2.5" xChannelSelector="R" yChannelSelector="G" />
+      </filter>
+    </svg>
     <main class="app-shell">
-      <header class="masthead">
-        <a class="wordmark" href="/" aria-label="Little Frame home">little frame</a>
-        <p>make a tiny thing worth sending</p>
-      </header>
-
       <section class="workspace" aria-label="Frame editor">
         <aside class="controls-panel">
           <div class="control-heading">
@@ -52,7 +55,6 @@
         </aside>
 
         <div class="preview-stage">
-          <div class="stage-label">YOUR FRAME</div>
           <div id="frame" class="frame" aria-label="Your shareable frame preview">
             <div class="photo-wrap">
               <img id="preview-image" alt="Your uploaded image" />
@@ -64,11 +66,8 @@
             <p id="quote-preview" class="quote-preview">a little moment</p>
             <div id="emoji-layer" class="emoji-layer" aria-label="Emoji decorations"></div>
           </div>
-          <p class="stage-note">PNG exports with transparency around the paper frame.</p>
         </div>
       </section>
-
-      <footer><span>made for the group chat</span><span>0–8 emoji maximum</span></footer>
     </main>
     <script src="app.js"></script>
   </body>
