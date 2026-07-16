@@ -60,6 +60,7 @@ textarea:focus, .emoji-entry input:focus { box-shadow: 3px 3px 0 var(--sun); }
 .emoji-list { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 12px; }
 .emoji-chip { display: flex; align-items: center; gap: 7px; padding: 4px 5px 4px 8px; border: 1px solid var(--ink); background: var(--paper); font-size: 18px; }
 .emoji-chip button { width: 18px; height: 18px; padding: 0; border: 0; color: var(--ink); background: transparent; font-size: 15px; line-height: 1; }
+.emoji-chip input[type="color"] { width: 20px; height: 20px; padding: 0; border: 0; background: transparent; cursor: pointer; }
 .export-button { display: flex; justify-content: space-between; align-items: center; width: 100%; padding: 15px 16px; border: 1px solid var(--ink); color: white; background: var(--leaf); box-shadow: 4px 4px 0 var(--ink); text-align: left; font-size: 11px; letter-spacing: .06em; text-transform: uppercase; transition: transform .15s, box-shadow .15s; }
 .export-button:hover { transform: translate(3px, 3px); box-shadow: 1px 1px 0 var(--ink); }
 .export-button:disabled { cursor: wait; opacity: .7; }
@@ -152,6 +153,14 @@ textarea { font-size: 28px; }
 .emoji-5 { font-size: .32em; font-weight: bold; letter-spacing: -12px; }
 .emoji-6 { font-size: .7em; transform: rotate(-5deg); }
 .emoji-7 { font-size: .8em; }
+.emoji-0 { color: #3364e6; }
+.emoji-1 { color: #fff1a7; }
+.emoji-2 { color: #f35436; }
+.emoji-3 { color: #8576e4; }
+.emoji-4 { color: pink; }
+.emoji-5 { color: #47af5c; }
+.emoji-6 { color: gold; }
+.emoji-7 { color: sienna; }
 
 @media (max-width: 760px) {
   body { padding: 28px 20px; }

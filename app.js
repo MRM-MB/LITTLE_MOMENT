@@ -10,6 +10,7 @@ const STARTING_POSITIONS = [
   { x: 5, y: 88 },
   { x: 89, y: 89 },
 ];
+const STARTING_COLORS = ['#3364e6', '#fff1a7', '#f35436', '#8576e4', '#ffc0cb', '#47af5c', '#ffd700', '#a0522d'];
 
 const state = {
   imageUrl: null,
@@ -77,6 +78,7 @@ function addEmoji() {
     value: emoji,
     x: position.x,
     y: position.y,
+    color: STARTING_COLORS[state.emojis.length],
   });
   emojiInput.value = '';
   renderEmojis();
@@ -100,13 +102,19 @@ function renderEmojis() {
     element.textContent = emoji.value;
     element.style.left = `${emoji.x}%`;
     element.style.top = `${emoji.y}%`;
+    element.style.color = emoji.color;
     element.dataset.id = emoji.id;
     element.addEventListener('pointerdown', startDrag);
     emojiLayer.append(element);
 
     const chip = document.createElement('div');
     chip.className = 'emoji-chip';
-    chip.innerHTML = `<span>${emoji.value}</span><button type="button" aria-label="Remove ${emoji.value}" title="Remove emoji">×</button>`;
+    chip.innerHTML = `<span>${emoji.value}</span><input type="color" value="${emoji.color}" aria-label="Color for ${emoji.value}" title="Choose emoji color"><button type="button" aria-label="Remove ${emoji.value}" title="Remove emoji">×</button>`;
+    chip.querySelector('input').addEventListener('input', (event) => {
+      emoji.color = event.target.value;
+      const preview = emojiLayer.querySelector(`[data-id="${emoji.id}"]`);
+      if (preview) preview.style.color = emoji.color;
+    });
     chip.querySelector('button').addEventListener('click', () => removeEmoji(emoji.id));
     emojiList.append(chip);
   }
@@ -201,6 +209,7 @@ async function exportPng() {
       context.save();
       context.translate((emoji.x / 100) * width + 30, (emoji.y / 100) * height + 30);
       context.rotate(([-10, 0, -10, 10, 15, 0, -5, 0][index] * Math.PI) / 180);
+      context.fillStyle = emoji.color;
       context.fillText(emoji.value, 0, 0);
       context.restore();
     });
