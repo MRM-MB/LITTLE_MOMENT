@@ -1,0 +1,75 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="theme-color" content="#efeee8" />
+    <title>Little Frame</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Gochi+Hand&display=swap" rel="stylesheet" />
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <main class="app-shell">
+      <header class="masthead">
+        <a class="wordmark" href="/" aria-label="Little Frame home">little frame</a>
+        <p>make a tiny thing worth sending</p>
+      </header>
+
+      <section class="workspace" aria-label="Frame editor">
+        <aside class="controls-panel">
+          <div class="control-heading">
+            <span>01 / IMAGE</span>
+            <label class="upload-button" for="image-input">Choose image</label>
+            <input id="image-input" type="file" accept="image/*" />
+          </div>
+
+          <div class="control-group">
+            <label for="quote-input">Your little note</label>
+            <textarea id="quote-input" maxlength="110" placeholder="a line to keep"></textarea>
+            <label class="toggle-row" for="quote-toggle">
+              <span>Show quote</span>
+              <input id="quote-toggle" type="checkbox" checked />
+              <span class="toggle" aria-hidden="true"></span>
+            </label>
+          </div>
+
+          <div class="control-group emoji-control">
+            <div class="label-row">
+              <label for="emoji-input">Emojis</label>
+              <span id="emoji-count">0 / 8</span>
+            </div>
+            <div class="emoji-entry">
+              <input id="emoji-input" type="text" maxlength="16" placeholder="paste an emoji" aria-label="Emoji to add" />
+              <button id="add-emoji" class="icon-button" type="button" aria-label="Add emoji" title="Add emoji">+</button>
+            </div>
+            <p class="hint">Tap an emoji in the preview to select it, then drag it around.</p>
+            <div id="emoji-list" class="emoji-list" aria-label="Added emojis"></div>
+          </div>
+
+          <button id="export-button" class="export-button" type="button">Export transparent PNG <span>↗</span></button>
+        </aside>
+
+        <div class="preview-stage">
+          <div class="stage-label">YOUR FRAME</div>
+          <div id="frame" class="frame" aria-label="Your shareable frame preview">
+            <div class="photo-wrap">
+              <img id="preview-image" alt="Your uploaded image" />
+              <div class="photo-placeholder" id="photo-placeholder">
+                <span>pick a photo</span>
+                <small>your memory goes here</small>
+              </div>
+            </div>
+            <p id="quote-preview" class="quote-preview">a little moment</p>
+            <div id="emoji-layer" class="emoji-layer" aria-label="Emoji decorations"></div>
+          </div>
+          <p class="stage-note">PNG exports with transparency around the paper frame.</p>
+        </div>
+      </section>
+
+      <footer><span>made for the group chat</span><span>0–8 emoji maximum</span></footer>
+    </main>
+    <script src="app.js"></script>
+  </body>
+</html>

@@ -1,0 +1,96 @@
+:root {
+  --ink: #242422;
+  --paper: #f8f6ef;
+  --line: #ccc9bd;
+  --pink: #ff6150;
+  --sun: #f6c947;
+  --leaf: #385e50;
+  --canvas: #eeeee8;
+}
+
+* { box-sizing: border-box; }
+
+body {
+  min-width: 320px;
+  margin: 0;
+  color: var(--ink);
+  background-color: var(--canvas);
+  background-image: radial-gradient(#c5c5bb 0.7px, transparent 0.7px);
+  background-size: 11px 11px;
+  font-family: "DM Mono", monospace;
+}
+
+button, input, textarea { font: inherit; }
+button { cursor: pointer; }
+
+.app-shell { width: min(1120px, calc(100% - 40px)); margin: 0 auto; padding: 28px 0 22px; }
+
+.masthead, footer { display: flex; justify-content: space-between; align-items: baseline; }
+.masthead { border-bottom: 1px solid var(--ink); padding-bottom: 18px; }
+.wordmark { color: var(--ink); font: 42px/1 "Gochi Hand", cursive; text-decoration: none; transform: rotate(-2deg); }
+.masthead p, footer { margin: 0; font-size: 10px; letter-spacing: .06em; text-transform: uppercase; }
+
+.workspace { display: grid; grid-template-columns: minmax(280px, 380px) 1fr; gap: clamp(44px, 9vw, 130px); align-items: center; min-height: calc(100vh - 145px); }
+.controls-panel { display: flex; flex-direction: column; gap: 25px; }
+.control-heading { display: flex; align-items: center; justify-content: space-between; font-size: 11px; letter-spacing: .07em; }
+#image-input { position: absolute; width: 1px; height: 1px; opacity: 0; pointer-events: none; }
+.upload-button { padding: 10px 12px; border: 1px solid var(--ink); background: var(--paper); cursor: pointer; box-shadow: 3px 3px 0 var(--ink); transition: transform .15s, box-shadow .15s; }
+.upload-button:hover { transform: translate(2px, 2px); box-shadow: 1px 1px 0 var(--ink); }
+
+.control-group { border-top: 1px solid var(--ink); padding-top: 13px; }
+.control-group > label, .label-row { display: block; margin-bottom: 9px; font-size: 10px; letter-spacing: .08em; text-transform: uppercase; }
+textarea, .emoji-entry input { width: 100%; border: 1px solid var(--ink); border-radius: 0; outline: none; color: var(--ink); background: #fffefa; }
+textarea { min-height: 88px; resize: vertical; padding: 10px; font: 26px/1.1 "Gochi Hand", cursive; }
+textarea:focus, .emoji-entry input:focus { box-shadow: 3px 3px 0 var(--sun); }
+
+.toggle-row { display: flex !important; align-items: center; justify-content: space-between; margin: 13px 0 0 !important; cursor: pointer; }
+.toggle-row input { position: absolute; opacity: 0; }
+.toggle { position: relative; width: 37px; height: 20px; border: 1px solid var(--ink); background: #fffefa; }
+.toggle::after { content: ""; position: absolute; top: 3px; left: 3px; width: 12px; height: 12px; border-radius: 50%; background: var(--ink); transition: transform .15s; }
+.toggle-row input:checked + .toggle { background: var(--sun); }
+.toggle-row input:checked + .toggle::after { transform: translateX(17px); }
+
+.label-row { display: flex; justify-content: space-between; }
+.label-row label { margin: 0; }
+.emoji-entry { display: flex; gap: 7px; }
+.emoji-entry input { min-width: 0; padding: 10px; }
+.icon-button { flex: 0 0 43px; border: 1px solid var(--ink); color: var(--ink); background: var(--pink); font-size: 24px; line-height: 1; }
+.icon-button:disabled { cursor: not-allowed; opacity: .45; }
+.hint { margin: 9px 0 0; color: #575751; font-size: 10px; line-height: 1.55; }
+.emoji-list { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 12px; }
+.emoji-chip { display: flex; align-items: center; gap: 7px; padding: 4px 5px 4px 8px; border: 1px solid var(--ink); background: var(--paper); font-size: 18px; }
+.emoji-chip button { width: 18px; height: 18px; padding: 0; border: 0; color: var(--ink); background: transparent; font-size: 15px; line-height: 1; }
+.export-button { display: flex; justify-content: space-between; align-items: center; width: 100%; padding: 15px 16px; border: 1px solid var(--ink); color: white; background: var(--leaf); box-shadow: 4px 4px 0 var(--ink); text-align: left; font-size: 11px; letter-spacing: .06em; text-transform: uppercase; transition: transform .15s, box-shadow .15s; }
+.export-button:hover { transform: translate(3px, 3px); box-shadow: 1px 1px 0 var(--ink); }
+.export-button:disabled { cursor: wait; opacity: .7; }
+.export-button span { font-size: 17px; }
+
+.preview-stage { display: grid; justify-items: center; gap: 15px; }
+.stage-label, .stage-note { font-size: 10px; letter-spacing: .08em; text-transform: uppercase; }
+.stage-note { margin: 0; color: #575751; text-align: center; line-height: 1.5; }
+.frame { position: relative; width: min(360px, 72vw); aspect-ratio: 4 / 5; padding: 24px; background: var(--paper); box-shadow: 5px 7px 19px #504f4326; transform: rotate(-5deg); }
+.photo-wrap { position: relative; width: 100%; aspect-ratio: 1; overflow: hidden; background: #ddd9cf; }
+.photo-wrap::after { content: ""; position: absolute; inset: 0; box-shadow: inset 2px 2px 5px #0006, inset -1px -1px 5px #0003; pointer-events: none; }
+#preview-image { display: none; width: 100%; height: 100%; object-fit: cover; filter: contrast(1.08) saturate(.88) brightness(.96); }
+#preview-image.visible { display: block; }
+.photo-placeholder { display: grid; width: 100%; height: 100%; place-content: center; gap: 4px; color: #716f68; background: repeating-linear-gradient(45deg, #e8e5dc 0 9px, #dedbd1 9px 18px); text-align: center; }
+.photo-placeholder span { font: 32px/1 "Gochi Hand", cursive; }
+.photo-placeholder small { font-size: 8px; text-transform: uppercase; }
+.quote-preview { min-height: 45px; margin: 19px 0 0; font: 34px/1.05 "Gochi Hand", cursive; text-align: right; overflow-wrap: anywhere; }
+.quote-preview.hidden { visibility: hidden; }
+.emoji-layer { position: absolute; inset: 0; pointer-events: none; }
+.emoji { position: absolute; z-index: 2; display: grid; width: 61px; height: 61px; place-items: center; border: 1px dashed transparent; font-family: "Apple Color Emoji", "Segoe UI Emoji", "Noto Color Emoji", sans-serif; font-size: 42px; line-height: 1; cursor: grab; -webkit-user-select: none; user-select: none; touch-action: none; pointer-events: auto; }
+.emoji.selected { border-color: var(--ink); background: #ffffff3d; }
+.emoji:active { cursor: grabbing; }
+
+footer { border-top: 1px solid var(--ink); padding-top: 15px; }
+
+@media (max-width: 760px) {
+  .app-shell { width: min(100% - 28px, 520px); padding-top: 18px; }
+  .masthead p { display: none; }
+  .wordmark { font-size: 38px; }
+  .workspace { grid-template-columns: 1fr; gap: 42px; padding: 42px 0; }
+  .controls-panel { order: 2; }
+  .preview-stage { order: 1; }
+  .frame { width: min(350px, 80vw); }
+}
