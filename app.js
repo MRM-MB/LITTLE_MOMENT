@@ -60,6 +60,7 @@ const state = {
 
 const imageInput = document.querySelector('#image-input');
 const previewImage = document.querySelector('#preview-image');
+const photoWrap = document.querySelector('.photo-wrap');
 const placeholder = document.querySelector('#photo-placeholder');
 const quoteInput = document.querySelector('#quote-input');
 const quoteToggle = document.querySelector('#quote-toggle');
@@ -471,6 +472,16 @@ function getExportScene(exportWidth = DEFAULT_EXPORT_WIDTH) {
       height: rect.height * scale,
     };
   };
+  const photoRect = photoWrap.getBoundingClientRect();
+  const photo = state.imageUrl
+    ? {
+        centerX: (photoRect.left + photoRect.width / 2 - areaRect.left) * scale,
+        centerY: (photoRect.top + photoRect.height / 2 - areaRect.top) * scale,
+        width: photoWrap.offsetWidth * scale,
+        height: photoWrap.offsetHeight * scale,
+        angle: frameAngle,
+      }
+    : null;
 
   const quoteStyle = getComputedStyle(quotePreview);
   const quote = state.showQuote && state.quote.trim()
@@ -488,12 +499,15 @@ function getExportScene(exportWidth = DEFAULT_EXPORT_WIDTH) {
     };
   });
 
-  return { quote, emojis };
+  return { photo, quote, emojis };
 }
 
 function drawExportTypography(canvas, scene, aesthetic) {
   const context = canvas.getContext('2d');
   context.setTransform(1, 0, 0, 1, 0, 0);
+  if (aesthetic && scene.photo) {
+    drawAestheticPhoto(canvas, scene.photo);
+  }
   if (scene.quote) {
     drawExportText(context, scene.quote);
   }
@@ -501,6 +515,55 @@ function drawExportTypography(canvas, scene, aesthetic) {
     if (aesthetic) drawDistortedExportText(context, emoji, index * 0.7 + 2);
     else drawExportText(context, emoji);
   });
+}
+
+function drawAestheticPhoto(canvas, photo) {
+  const width = Math.ceil(photo.width);
+  const height = Math.ceil(photo.height);
+  const source = document.createElement('canvas');
+  source.width = width;
+  source.height = height;
+  const sourceContext = source.getContext('2d');
+  sourceContext.translate(width / 2, height / 2);
+  sourceContext.rotate(-photo.angle);
+  sourceContext.filter = 'saturate(1.04) contrast(1.025)';
+  sourceContext.drawImage(canvas, -photo.centerX, -photo.centerY);
+
+  const displaced = document.createElement('canvas');
+  displaced.width = width;
+  displaced.height = height;
+  const displacedContext = displaced.getContext('2d');
+  displacedContext.drawImage(source, 0, 0);
+  const resolutionScale = canvas.width / DEFAULT_EXPORT_WIDTH;
+  const sliceHeight = Math.max(2, Math.round(2 * resolutionScale));
+  const horizontalStrength = 2.2 * resolutionScale;
+  const verticalStrength = 0.7 * resolutionScale;
+  for (let y = 0; y < height; y += sliceHeight) {
+    const localY = y / resolutionScale;
+    const horizontalNoise =
+      Math.sin(localY * 0.16 + 1.4) * 0.48 +
+      Math.sin(localY * 0.53 + 4.1) * 0.34 +
+      Math.sin(localY * 1.17 + 2.2) * 0.18;
+    const verticalNoise = Math.sin(localY * 0.29 + 0.8) * verticalStrength;
+    displacedContext.drawImage(
+      source,
+      0,
+      y,
+      width,
+      sliceHeight,
+      horizontalNoise * horizontalStrength,
+      y + verticalNoise,
+      width,
+      sliceHeight,
+    );
+  }
+
+  const context = canvas.getContext('2d');
+  context.save();
+  context.translate(photo.centerX, photo.centerY);
+  context.rotate(photo.angle);
+  context.drawImage(displaced, -width / 2, -height / 2);
+  context.restore();
 }
 
 function drawDistortedExportText(context, text, phase) {
