@@ -543,7 +543,7 @@ function drawAestheticPhoto(canvas, photo) {
   }
   sourceContext.setTransform(1, 0, 0, 1, 0, 0);
   sourceContext.putImageData(image, 0, 0);
-  drawAestheticGlow(sourceContext, width, height);
+  drawGlitterOverlay(sourceContext, width, height, canvas.width / DEFAULT_EXPORT_WIDTH);
 
   const context = canvas.getContext('2d');
   context.save();
@@ -553,51 +553,52 @@ function drawAestheticPhoto(canvas, photo) {
   context.restore();
 }
 
-function drawAestheticGlow(context, width, height) {
+function drawGlitterOverlay(context, width, height, resolutionScale) {
   context.save();
   context.globalCompositeOperation = 'soft-light';
 
   const iridescence = context.createLinearGradient(0, height, width, 0);
-  iridescence.addColorStop(0, '#ff7fba4a');
-  iridescence.addColorStop(0.34, '#ffd6ec18');
-  iridescence.addColorStop(0.62, '#d9f5ff1c');
-  iridescence.addColorStop(1, '#70d8ff42');
+  iridescence.addColorStop(0, '#ff4fac38');
+  iridescence.addColorStop(0.25, '#ffdc6830');
+  iridescence.addColorStop(0.5, '#9cffd72b');
+  iridescence.addColorStop(0.75, '#6edcff30');
+  iridescence.addColorStop(1, '#b46cff38');
   context.fillStyle = iridescence;
   context.fillRect(0, 0, width, height);
 
-  context.globalCompositeOperation = 'screen';
-
-  const pinkGlow = context.createRadialGradient(width * 0.08, height * 0.12, 0, width * 0.08, height * 0.12, width * 0.72);
-  pinkGlow.addColorStop(0, '#ff8fc97a');
-  pinkGlow.addColorStop(0.42, '#ffbad538');
-  pinkGlow.addColorStop(1, '#ffbad500');
-  context.fillStyle = pinkGlow;
-  context.fillRect(0, 0, width, height);
-
-  const blueGlow = context.createRadialGradient(width * 0.92, height * 0.82, 0, width * 0.92, height * 0.82, width * 0.65);
-  blueGlow.addColorStop(0, '#a8e9ff50');
-  blueGlow.addColorStop(0.5, '#c9f2ff1f');
-  blueGlow.addColorStop(1, '#c9f2ff00');
-  context.fillStyle = blueGlow;
-  context.fillRect(0, 0, width, height);
-
-  const sheen = context.createLinearGradient(0, height, width, 0);
-  sheen.addColorStop(0.28, '#ffffff00');
-  sheen.addColorStop(0.46, '#ffffff0a');
-  sheen.addColorStop(0.53, '#ffffff28');
-  sheen.addColorStop(0.61, '#ffffff08');
-  sheen.addColorStop(0.76, '#ffffff00');
-  context.fillStyle = sheen;
-  context.fillRect(0, 0, width, height);
-
   context.globalCompositeOperation = 'source-over';
-  drawGlossySparkle(context, width * 0.79, height * 0.18, width * 0.045);
-  drawGlossySparkle(context, width * 0.18, height * 0.68, width * 0.028);
-  drawGlossySparkle(context, width * 0.67, height * 0.78, width * 0.016);
+  const logicalArea = (width / resolutionScale) * (height / resolutionScale);
+  const particleCount = Math.round(logicalArea / 520);
+  const colors = ['#ff4fac', '#7de7ff', '#b66cff', '#ffd85c', '#76f0c2', '#ff8f70'];
+  for (let index = 0; index < particleCount; index++) {
+    const x = glitterRandom(index, 1) * width;
+    const y = glitterRandom(index, 2) * height;
+    const size = (0.75 + glitterRandom(index, 3) * 1.65) * resolutionScale;
+    const color = colors[Math.floor(glitterRandom(index, 4) * colors.length)];
+    const shape = glitterRandom(index, 5);
+    if (shape > 0.88) {
+      drawGlitterStar(context, x, y, size * 2.5, color);
+    } else {
+      context.save();
+      context.translate(x, y);
+      context.rotate(glitterRandom(index, 6) * Math.PI);
+      context.fillStyle = `${color}${shape > 0.45 ? 'd9' : '9e'}`;
+      context.shadowColor = color;
+      context.shadowBlur = size * 1.4;
+      if (shape > 0.45) {
+        context.fillRect(-size / 2, -size / 2, size, size);
+      } else {
+        context.beginPath();
+        context.arc(0, 0, size * 0.42, 0, Math.PI * 2);
+        context.fill();
+      }
+      context.restore();
+    }
+  }
   context.restore();
 }
 
-function drawGlossySparkle(context, centerX, centerY, radius) {
+function drawGlitterStar(context, centerX, centerY, radius, color) {
   context.save();
   context.translate(centerX, centerY);
   context.beginPath();
@@ -607,15 +608,20 @@ function drawGlossySparkle(context, centerX, centerY, radius) {
   context.bezierCurveTo(-radius * 0.12, radius * 0.2, -radius * 0.2, radius * 0.12, -radius, 0);
   context.bezierCurveTo(-radius * 0.2, -radius * 0.12, -radius * 0.12, -radius * 0.2, 0, -radius);
   context.closePath();
-  context.fillStyle = '#ffffffd9';
-  context.shadowColor = '#ff69b4b8';
-  context.shadowBlur = radius * 0.65;
+  context.fillStyle = '#ffffffeb';
+  context.shadowColor = color;
+  context.shadowBlur = radius * 0.9;
   context.fill();
   context.shadowBlur = 0;
-  context.strokeStyle = '#ff69b48f';
+  context.strokeStyle = `${color}d9`;
   context.lineWidth = Math.max(1, radius * 0.08);
   context.stroke();
   context.restore();
+}
+
+function glitterRandom(index, salt) {
+  const value = Math.sin(index * 127.1 + salt * 311.7) * 43758.5453;
+  return value - Math.floor(value);
 }
 
 function aestheticNoise(x, y) {
