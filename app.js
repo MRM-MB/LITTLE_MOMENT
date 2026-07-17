@@ -1,4 +1,4 @@
-const EXPORT_WIDTH = 720;
+const DEFAULT_EXPORT_WIDTH = 720;
 const STARTING_POSITIONS = [
   { x: -6, y: -6 },
   { x: 10, y: 10 },
@@ -411,7 +411,9 @@ async function exportPng() {
   exportButton.firstChild.textContent = 'Making PNG ';
 
   try {
-    const canvas = await capturePreview(null, 2);
+    const exportWidth = Number(document.querySelector('[name="export-size"]:checked').value);
+    const aesthetic = document.querySelector('[name="export-style"]:checked').value === 'aesthetic';
+    const canvas = await capturePreview({ exportWidth, aesthetic });
     const png = await new Promise((resolve) => canvas.toBlob(resolve, 'image/png'));
     if (!png) throw new Error('PNG creation failed');
     const link = document.createElement('a');
@@ -428,11 +430,11 @@ async function exportPng() {
   }
 }
 
-async function capturePreview(backgroundColor = null, animationFrame = 0) {
+async function capturePreview({ exportWidth = DEFAULT_EXPORT_WIDTH, aesthetic = false } = {}) {
   if (!window.html2canvas) throw new Error('Preview capture did not load');
   if (document.fonts?.ready) await document.fonts.ready;
 
-  const scene = getExportScene();
+  const scene = getExportScene(exportWidth);
   const quoteDisplay = quotePreview.style.display;
   const emojiVisibility = emojiLayer.style.visibility;
   exportArea.classList.add('is-exporting');
@@ -440,23 +442,14 @@ async function capturePreview(backgroundColor = null, animationFrame = 0) {
   emojiLayer.style.visibility = 'hidden';
   try {
     const canvas = await window.html2canvas(exportArea, {
-      backgroundColor,
-      scale: EXPORT_WIDTH / exportArea.getBoundingClientRect().width,
+      backgroundColor: null,
+      scale: exportWidth / exportArea.getBoundingClientRect().width,
       useCORS: true,
       logging: false,
       foreignObjectRendering: false,
     });
-    drawExportTypography(canvas, scene, animationFrame);
-    if (!backgroundColor) return canvas;
-
-    const opaqueCanvas = document.createElement('canvas');
-    opaqueCanvas.width = canvas.width;
-    opaqueCanvas.height = canvas.height;
-    const context = opaqueCanvas.getContext('2d');
-    context.fillStyle = backgroundColor;
-    context.fillRect(0, 0, opaqueCanvas.width, opaqueCanvas.height);
-    context.drawImage(canvas, 0, 0);
-    return opaqueCanvas;
+    drawExportTypography(canvas, scene, aesthetic);
+    return canvas;
   } finally {
     quotePreview.style.display = quoteDisplay;
     emojiLayer.style.visibility = emojiVisibility;
@@ -464,9 +457,9 @@ async function capturePreview(backgroundColor = null, animationFrame = 0) {
   }
 }
 
-function getExportScene() {
+function getExportScene(exportWidth = DEFAULT_EXPORT_WIDTH) {
   const areaRect = exportArea.getBoundingClientRect();
-  const scale = EXPORT_WIDTH / areaRect.width;
+  const scale = exportWidth / areaRect.width;
   const frameTransform = getComputedStyle(frame).transform;
   const frameAngle = getTransformAngle(frameTransform);
   const getCoordinates = (element) => {
@@ -498,14 +491,15 @@ function getExportScene() {
   return { quote, emojis };
 }
 
-function drawExportTypography(canvas, scene, animationFrame) {
+function drawExportTypography(canvas, scene, aesthetic) {
   const context = canvas.getContext('2d');
   context.setTransform(1, 0, 0, 1, 0, 0);
   if (scene.quote) {
     drawExportText(context, scene.quote);
   }
   scene.emojis.forEach((emoji, index) => {
-    drawDistortedExportText(context, emoji, animationFrame + index * 0.7);
+    if (aesthetic) drawDistortedExportText(context, emoji, index * 0.7 + 2);
+    else drawExportText(context, emoji);
   });
 }
 
@@ -515,10 +509,16 @@ function drawDistortedExportText(context, text, phase) {
   layer.height = context.canvas.height;
   drawExportText(layer.getContext('2d'), text);
 
-  const sliceHeight = 4;
-  const amplitude = phase ? 3.5 : 0;
+  const resolutionScale = context.canvas.width / DEFAULT_EXPORT_WIDTH;
+  const sliceHeight = Math.max(2, Math.round(2 * resolutionScale));
+  const amplitude = 2.8 * resolutionScale;
   for (let y = 0; y < layer.height; y += sliceHeight) {
-    const offset = Math.sin(y * 0.09 + phase * 1.7) * amplitude;
+    const sourceY = y / resolutionScale;
+    const turbulence =
+      Math.sin(sourceY * 0.71 + phase * 1.7) * 0.5 +
+      Math.sin(sourceY * 0.19 + phase * 2.3) * 0.32 +
+      Math.sin(sourceY * 1.37 + phase * 0.8) * 0.18;
+    const offset = turbulence * amplitude;
     context.drawImage(layer, 0, y, layer.width, sliceHeight, offset, y, layer.width, sliceHeight);
   }
 }

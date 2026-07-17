@@ -13,6 +13,7 @@
 html {
   scrollbar-width: none;
   -ms-overflow-style: none;
+  overflow-x: hidden;
 }
 
 html::-webkit-scrollbar { display: none; }
@@ -153,6 +154,18 @@ textarea { font: 28px/1.1 "Gochi Hand", cursive; }
 .export-button { border: 2px solid var(--ink); box-shadow: 4px 4px 0 var(--pink); font-size: 16px; text-transform: none; }
 .export-button:hover { transform: translate(3px, 3px); box-shadow: none; }
 .export-actions { display: grid; gap: 10px; }
+.export-options { min-width: 0; margin: 0; padding: 0; border: 0; }
+.export-options legend { margin-bottom: 5px; padding: 0; font-size: 13px; font-weight: 700; }
+.segmented-control { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); border: 2px solid var(--ink); background: var(--paper); }
+.export-options:nth-child(2) .segmented-control { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+.segmented-control label { min-width: 0; cursor: pointer; }
+.segmented-control label + label { border-left: 2px solid var(--ink); }
+.segmented-control input { position: absolute; opacity: 0; pointer-events: none; }
+.segmented-control span { display: grid; min-height: 44px; padding: 6px 4px; place-content: center; gap: 3px; font: 700 12px/1 "Kanit", sans-serif; text-align: center; }
+.segmented-control small { color: #717171; font-size: 9px; font-weight: 400; }
+.segmented-control input:checked + span { color: var(--paper); background: var(--ink); }
+.segmented-control input:checked + span small { color: #ffffffb8; }
+.segmented-control input:focus-visible + span { box-shadow: inset 0 0 0 3px var(--pink); }
 .animated-export-button { display: flex; justify-content: space-between; align-items: center; width: 100%; padding: 11px 14px; border: 2px solid var(--ink); color: var(--ink); background: var(--paper); box-shadow: 3px 3px 0 var(--ink); font: 700 14px/1 "Kanit", sans-serif; }
 .animated-export-button:hover { transform: translate(3px, 3px); box-shadow: none; }
 .animated-export-button:disabled { cursor: wait; opacity: .7; }
