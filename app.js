@@ -115,20 +115,34 @@ emojiResults.addEventListener('click', (event) => {
 });
 exportButton.addEventListener('click', exportPng);
 
-function handleImageUpload(event) {
+async function handleImageUpload(event) {
   const [file] = event.target.files;
   if (!file) return;
 
-  if (state.imageUrl) URL.revokeObjectURL(state.imageUrl);
-  state.imageUrl = URL.createObjectURL(file);
-  const image = new Image();
-  image.onload = () => {
-    state.imageElement = image;
-    previewImage.src = state.imageUrl;
-    previewImage.classList.add('visible');
-    placeholder.hidden = true;
-  };
-  image.src = state.imageUrl;
+  try {
+    const imageUrl = await readImageAsDataUrl(file);
+    const image = new Image();
+    image.onload = () => {
+      state.imageUrl = imageUrl;
+      state.imageElement = image;
+      previewImage.src = imageUrl;
+      previewImage.classList.add('visible');
+      placeholder.hidden = true;
+    };
+    image.src = imageUrl;
+  } catch (error) {
+    window.alert('Could not load this image. Please choose another one.');
+    console.error(error);
+  }
+}
+
+function readImageAsDataUrl(file) {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onload = () => resolve(reader.result);
+    reader.onerror = reject;
+    reader.readAsDataURL(file);
+  });
 }
 
 function addEmoji(value = emojiInput.value) {
