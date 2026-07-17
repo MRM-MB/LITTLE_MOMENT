@@ -511,10 +511,7 @@ function drawExportTypography(canvas, scene, aesthetic) {
   if (scene.quote) {
     drawExportText(context, scene.quote);
   }
-  scene.emojis.forEach((emoji, index) => {
-    if (aesthetic) drawDistortedExportText(context, emoji, index * 0.7 + 2);
-    else drawExportText(context, emoji);
-  });
+  scene.emojis.forEach((emoji) => drawExportText(context, emoji, 0, true));
 }
 
 function drawAestheticPhoto(canvas, photo) {
@@ -526,80 +523,61 @@ function drawAestheticPhoto(canvas, photo) {
   const sourceContext = source.getContext('2d');
   sourceContext.translate(width / 2, height / 2);
   sourceContext.rotate(-photo.angle);
-  sourceContext.filter = 'saturate(1.04) contrast(1.025)';
   sourceContext.drawImage(canvas, -photo.centerX, -photo.centerY);
 
-  const displaced = document.createElement('canvas');
-  displaced.width = width;
-  displaced.height = height;
-  const displacedContext = displaced.getContext('2d');
-  displacedContext.drawImage(source, 0, 0);
-  const resolutionScale = canvas.width / DEFAULT_EXPORT_WIDTH;
-  const sliceHeight = Math.max(2, Math.round(2 * resolutionScale));
-  const horizontalStrength = 2.2 * resolutionScale;
-  const verticalStrength = 0.7 * resolutionScale;
-  for (let y = 0; y < height; y += sliceHeight) {
-    const localY = y / resolutionScale;
-    const horizontalNoise =
-      Math.sin(localY * 0.16 + 1.4) * 0.48 +
-      Math.sin(localY * 0.53 + 4.1) * 0.34 +
-      Math.sin(localY * 1.17 + 2.2) * 0.18;
-    const verticalNoise = Math.sin(localY * 0.29 + 0.8) * verticalStrength;
-    displacedContext.drawImage(
-      source,
-      0,
-      y,
-      width,
-      sliceHeight,
-      horizontalNoise * horizontalStrength,
-      y + verticalNoise,
-      width,
-      sliceHeight,
-    );
+  const image = sourceContext.getImageData(0, 0, width, height);
+  const pixels = image.data;
+  for (let y = 0; y < height; y++) {
+    for (let x = 0; x < width; x++) {
+      const index = (y * width + x) * 4;
+      const red = pixels[index];
+      const green = pixels[index + 1];
+      const blue = pixels[index + 2];
+      const luminance = red * 0.299 + green * 0.587 + blue * 0.114;
+      const vignetteX = (x / width - 0.5) * 2;
+      const vignetteY = (y / height - 0.5) * 2;
+      const vignette = Math.max(0, vignetteX * vignetteX + vignetteY * vignetteY - 0.35) * 7;
+      const grain = (filmNoise(x, y) - 0.5) * 7;
+      pixels[index] = clamp((red - 128) * 0.94 + 132 + luminance * 0.025 + grain - vignette + 3, 0, 255);
+      pixels[index + 1] = clamp((green - 128) * 0.94 + 132 + luminance * 0.018 + grain - vignette + 1, 0, 255);
+      pixels[index + 2] = clamp((blue - 128) * 0.92 + 132 + luminance * 0.01 + grain - vignette - 2, 0, 255);
+    }
   }
+  sourceContext.setTransform(1, 0, 0, 1, 0, 0);
+  sourceContext.putImageData(image, 0, 0);
 
   const context = canvas.getContext('2d');
   context.save();
   context.translate(photo.centerX, photo.centerY);
   context.rotate(photo.angle);
-  context.drawImage(displaced, -width / 2, -height / 2);
+  context.drawImage(source, -width / 2, -height / 2);
   context.restore();
 }
 
-function drawDistortedExportText(context, text, phase) {
-  const layer = document.createElement('canvas');
-  layer.width = context.canvas.width;
-  layer.height = context.canvas.height;
-  drawExportText(layer.getContext('2d'), text);
-
-  const resolutionScale = context.canvas.width / DEFAULT_EXPORT_WIDTH;
-  const sliceHeight = Math.max(2, Math.round(2 * resolutionScale));
-  const amplitude = 2.8 * resolutionScale;
-  for (let y = 0; y < layer.height; y += sliceHeight) {
-    const sourceY = y / resolutionScale;
-    const turbulence =
-      Math.sin(sourceY * 0.71 + phase * 1.7) * 0.5 +
-      Math.sin(sourceY * 0.19 + phase * 2.3) * 0.32 +
-      Math.sin(sourceY * 1.37 + phase * 0.8) * 0.18;
-    const offset = turbulence * amplitude;
-    context.drawImage(layer, 0, y, layer.width, sliceHeight, offset, y, layer.width, sliceHeight);
-  }
+function filmNoise(x, y) {
+  const value = Math.sin(x * 12.9898 + y * 78.233) * 43758.5453;
+  return value - Math.floor(value);
 }
 
-function drawExportText(context, text, offsetX = 0) {
+function drawExportText(context, text, offsetX = 0, useFontBox = false) {
   context.save();
   context.translate(text.x + text.width / 2 + offsetX, text.y + text.height / 2);
   context.rotate(text.angle);
   context.fillStyle = text.color;
   context.font = text.font;
-  context.textAlign = 'left';
   context.textBaseline = 'alphabetic';
   const metrics = context.measureText(text.value);
-  const inkWidth = metrics.actualBoundingBoxLeft + metrics.actualBoundingBoxRight;
-  const inkHeight = metrics.actualBoundingBoxAscent + metrics.actualBoundingBoxDescent;
-  const drawX = -inkWidth / 2 + metrics.actualBoundingBoxLeft;
-  const drawY = inkHeight / 2 - metrics.actualBoundingBoxDescent;
-  context.fillText(text.value, drawX, drawY);
+  if (useFontBox) {
+    const ascent = metrics.fontBoundingBoxAscent || metrics.actualBoundingBoxAscent;
+    const descent = metrics.fontBoundingBoxDescent || metrics.actualBoundingBoxDescent;
+    context.textAlign = 'center';
+    context.fillText(text.value, 0, (ascent - descent) / 2);
+  } else {
+    const inkWidth = metrics.actualBoundingBoxLeft + metrics.actualBoundingBoxRight;
+    const inkHeight = metrics.actualBoundingBoxAscent + metrics.actualBoundingBoxDescent;
+    context.textAlign = 'left';
+    context.fillText(text.value, -inkWidth / 2 + metrics.actualBoundingBoxLeft, inkHeight / 2 - metrics.actualBoundingBoxDescent);
+  }
   context.restore();
 }
 
