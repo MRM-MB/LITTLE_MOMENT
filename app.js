@@ -534,17 +534,16 @@ function drawAestheticPhoto(canvas, photo) {
       const green = pixels[index + 1];
       const blue = pixels[index + 2];
       const luminance = red * 0.299 + green * 0.587 + blue * 0.114;
-      const vignetteX = (x / width - 0.5) * 2;
-      const vignetteY = (y / height - 0.5) * 2;
-      const vignette = Math.max(0, vignetteX * vignetteX + vignetteY * vignetteY - 0.35) * 7;
-      const grain = (filmNoise(x, y) - 0.5) * 7;
-      pixels[index] = clamp((red - 128) * 0.94 + 132 + luminance * 0.025 + grain - vignette + 3, 0, 255);
-      pixels[index + 1] = clamp((green - 128) * 0.94 + 132 + luminance * 0.018 + grain - vignette + 1, 0, 255);
-      pixels[index + 2] = clamp((blue - 128) * 0.92 + 132 + luminance * 0.01 + grain - vignette - 2, 0, 255);
+      const highlight = Math.max(0, luminance - 150) * 0.055;
+      const grain = (aestheticNoise(x, y) - 0.5) * 3;
+      pixels[index] = clamp((red - 128) * 1.045 + 132 + highlight + grain + 2, 0, 255);
+      pixels[index + 1] = clamp((green - 128) * 1.035 + 132 + highlight + grain + 1, 0, 255);
+      pixels[index + 2] = clamp((blue - 128) * 1.055 + 132 + highlight * 1.15 + grain + 3, 0, 255);
     }
   }
   sourceContext.setTransform(1, 0, 0, 1, 0, 0);
   sourceContext.putImageData(image, 0, 0);
+  drawAestheticGlow(sourceContext, width, height);
 
   const context = canvas.getContext('2d');
   context.save();
@@ -554,7 +553,72 @@ function drawAestheticPhoto(canvas, photo) {
   context.restore();
 }
 
-function filmNoise(x, y) {
+function drawAestheticGlow(context, width, height) {
+  context.save();
+  context.globalCompositeOperation = 'soft-light';
+
+  const iridescence = context.createLinearGradient(0, height, width, 0);
+  iridescence.addColorStop(0, '#ff7fba4a');
+  iridescence.addColorStop(0.34, '#ffd6ec18');
+  iridescence.addColorStop(0.62, '#d9f5ff1c');
+  iridescence.addColorStop(1, '#70d8ff42');
+  context.fillStyle = iridescence;
+  context.fillRect(0, 0, width, height);
+
+  context.globalCompositeOperation = 'screen';
+
+  const pinkGlow = context.createRadialGradient(width * 0.08, height * 0.12, 0, width * 0.08, height * 0.12, width * 0.72);
+  pinkGlow.addColorStop(0, '#ff8fc97a');
+  pinkGlow.addColorStop(0.42, '#ffbad538');
+  pinkGlow.addColorStop(1, '#ffbad500');
+  context.fillStyle = pinkGlow;
+  context.fillRect(0, 0, width, height);
+
+  const blueGlow = context.createRadialGradient(width * 0.92, height * 0.82, 0, width * 0.92, height * 0.82, width * 0.65);
+  blueGlow.addColorStop(0, '#a8e9ff50');
+  blueGlow.addColorStop(0.5, '#c9f2ff1f');
+  blueGlow.addColorStop(1, '#c9f2ff00');
+  context.fillStyle = blueGlow;
+  context.fillRect(0, 0, width, height);
+
+  const sheen = context.createLinearGradient(0, height, width, 0);
+  sheen.addColorStop(0.28, '#ffffff00');
+  sheen.addColorStop(0.46, '#ffffff0a');
+  sheen.addColorStop(0.53, '#ffffff28');
+  sheen.addColorStop(0.61, '#ffffff08');
+  sheen.addColorStop(0.76, '#ffffff00');
+  context.fillStyle = sheen;
+  context.fillRect(0, 0, width, height);
+
+  context.globalCompositeOperation = 'source-over';
+  drawGlossySparkle(context, width * 0.79, height * 0.18, width * 0.045);
+  drawGlossySparkle(context, width * 0.18, height * 0.68, width * 0.028);
+  drawGlossySparkle(context, width * 0.67, height * 0.78, width * 0.016);
+  context.restore();
+}
+
+function drawGlossySparkle(context, centerX, centerY, radius) {
+  context.save();
+  context.translate(centerX, centerY);
+  context.beginPath();
+  context.moveTo(0, -radius);
+  context.bezierCurveTo(radius * 0.12, -radius * 0.2, radius * 0.2, -radius * 0.12, radius, 0);
+  context.bezierCurveTo(radius * 0.2, radius * 0.12, radius * 0.12, radius * 0.2, 0, radius);
+  context.bezierCurveTo(-radius * 0.12, radius * 0.2, -radius * 0.2, radius * 0.12, -radius, 0);
+  context.bezierCurveTo(-radius * 0.2, -radius * 0.12, -radius * 0.12, -radius * 0.2, 0, -radius);
+  context.closePath();
+  context.fillStyle = '#ffffffd9';
+  context.shadowColor = '#ff69b4b8';
+  context.shadowBlur = radius * 0.65;
+  context.fill();
+  context.shadowBlur = 0;
+  context.strokeStyle = '#ff69b48f';
+  context.lineWidth = Math.max(1, radius * 0.08);
+  context.stroke();
+  context.restore();
+}
+
+function aestheticNoise(x, y) {
   const value = Math.sin(x * 12.9898 + y * 78.233) * 43758.5453;
   return value - Math.floor(value);
 }
