@@ -1,23 +1,30 @@
 :root {
-  --ink: #242422;
-  --paper: #f8f6ef;
-  --line: #ccc9bd;
-  --pink: #ff6150;
-  --sun: #f6c947;
-  --leaf: #385e50;
-  --canvas: #eeeee8;
+  --ink: #333333;
+  --paper: #ffffff;
+  --line: #333333;
+  --pink: #FF6978;
+  --sun: #f8f7f3;
+  --leaf: #333333;
+  --canvas: #f8f7f3;
 }
 
 * { box-sizing: border-box; }
+
+html {
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+
+html::-webkit-scrollbar { display: none; }
 
 body {
   min-width: 320px;
   margin: 0;
   color: var(--ink);
   background-color: var(--canvas);
-  background-image: radial-gradient(#c5c5bb 0.7px, transparent 0.7px);
-  background-size: 11px 11px;
-  font-family: "DM Mono", monospace;
+  background-image: radial-gradient(circle, #c8c8c8 1px, transparent 1px);
+  background-size: 25px 25px;
+  font-family: "Kanit", sans-serif;
 }
 
 button, input, textarea { font: inherit; }
@@ -47,13 +54,17 @@ textarea:focus, .emoji-entry input:focus { box-shadow: 3px 3px 0 var(--sun); }
 .toggle-row input { position: absolute; opacity: 0; }
 .toggle { position: relative; width: 37px; height: 20px; border: 1px solid var(--ink); background: #fffefa; }
 .toggle::after { content: ""; position: absolute; top: 3px; left: 3px; width: 12px; height: 12px; border-radius: 50%; background: var(--ink); transition: transform .15s; }
-.toggle-row input:checked + .toggle { background: var(--sun); }
+.toggle-row input:checked + .toggle { background: var(--pink); }
 .toggle-row input:checked + .toggle::after { transform: translateX(17px); }
 
 .label-row { display: flex; justify-content: space-between; }
 .label-row label { margin: 0; }
 .emoji-entry { display: flex; gap: 7px; }
 .emoji-entry input { min-width: 0; padding: 10px; }
+.emoji-palette { display: flex; flex-wrap: wrap; gap: 5px; margin-bottom: 9px; }
+.emoji-palette button { display: grid; width: 32px; height: 32px; padding: 0; border: 1px solid #b8b8b8; background: #fffefa; place-items: center; font: 18px/1 "Noto Emoji", sans-serif; }
+.emoji-palette button:hover, .emoji-palette button:focus-visible { border-color: var(--ink); background: var(--sun); }
+.emoji-palette button:disabled { cursor: not-allowed; opacity: .45; }
 .icon-button { flex: 0 0 43px; border: 1px solid var(--ink); color: var(--ink); background: var(--pink); font-size: 24px; line-height: 1; }
 .icon-button:disabled { cursor: not-allowed; opacity: .45; }
 .hint { margin: 9px 0 0; color: #575751; font-size: 10px; line-height: 1.55; }
@@ -61,6 +72,20 @@ textarea:focus, .emoji-entry input:focus { box-shadow: 3px 3px 0 var(--sun); }
 .emoji-chip { display: flex; align-items: center; gap: 7px; padding: 4px 5px 4px 8px; border: 1px solid var(--ink); background: var(--paper); font-size: 18px; }
 .emoji-chip button { width: 18px; height: 18px; padding: 0; border: 0; color: var(--ink); background: transparent; font-size: 15px; line-height: 1; }
 .emoji-chip input[type="color"] { width: 20px; height: 20px; padding: 0; border: 0; background: transparent; cursor: pointer; }
+.emoji-editor { display: grid; gap: 7px; margin-top: 13px; padding: 10px; border: 1px solid #b8b8b8; background: #fffefa; }
+.emoji-editor[hidden] { display: none; }
+.emoji-editor > label { display: flex; justify-content: space-between; font-size: 15px; }
+.emoji-editor output { color: #575751; }
+.emoji-editor input[type="range"] { width: 100%; accent-color: var(--leaf); }
+.color-suggestions { display: flex; gap: 7px; padding-top: 3px; }
+.color-suggestions button { width: 23px; height: 23px; padding: 0; border: 1px solid #b8b8b8; border-radius: 50%; background: var(--swatch); }
+.color-suggestions button.active { outline: 2px solid var(--ink); outline-offset: 2px; }
+.swatch-coral { --swatch: #f35436; }
+.swatch-blue { --swatch: #3364e6; }
+.swatch-yellow { --swatch: #fff1a7; }
+.swatch-lavender { --swatch: #8576e4; }
+.swatch-green { --swatch: #47af5c; }
+.swatch-sienna { --swatch: #a0522d; }
 .export-button { display: flex; justify-content: space-between; align-items: center; width: 100%; padding: 15px 16px; border: 1px solid var(--ink); color: white; background: var(--leaf); box-shadow: 4px 4px 0 var(--ink); text-align: left; font-size: 11px; letter-spacing: .06em; text-transform: uppercase; transition: transform .15s, box-shadow .15s; }
 .export-button:hover { transform: translate(3px, 3px); box-shadow: 1px 1px 0 var(--ink); }
 .export-button:disabled { cursor: wait; opacity: .7; }
@@ -71,8 +96,8 @@ textarea:focus, .emoji-entry input:focus { box-shadow: 3px 3px 0 var(--sun); }
 .stage-note { margin: 0; color: #575751; text-align: center; line-height: 1.5; }
 .frame { position: relative; width: min(360px, 72vw); aspect-ratio: 4 / 5; padding: 24px; background: var(--paper); box-shadow: 5px 7px 19px #504f4326; transform: rotate(-5deg); }
 .photo-wrap { position: relative; width: 100%; aspect-ratio: 1; overflow: hidden; background: #ddd9cf; }
-.photo-wrap::after { content: ""; position: absolute; inset: 0; box-shadow: inset 2px 2px 5px #0006, inset -1px -1px 5px #0003; pointer-events: none; }
-#preview-image { display: none; width: 100%; height: 100%; object-fit: cover; filter: contrast(1.08) saturate(.88) brightness(.96); }
+.photo-wrap::after { content: ""; position: absolute; inset: 0; pointer-events: none; }
+#preview-image { display: none; width: 100%; height: 100%; object-fit: cover; }
 #preview-image.visible { display: block; }
 .photo-placeholder { display: grid; width: 100%; height: 100%; place-content: center; gap: 4px; color: #716f68; background: repeating-linear-gradient(45deg, #e8e5dc 0 9px, #dedbd1 9px 18px); text-align: center; }
 .photo-placeholder span { font: 32px/1 "Gochi Hand", cursive; }
@@ -99,40 +124,73 @@ footer { border-top: 1px solid var(--ink); padding-top: 15px; }
 /* The card remains the artwork; controls deliberately stay secondary to it. */
 body {
   padding: 36px;
-  color: #222;
-  background: #ececec;
-  font-family: "Gochi Hand", cursive;
+  color: var(--ink);
+  background-color: var(--canvas);
+  font-family: "Kanit", sans-serif;
   -webkit-font-smoothing: antialiased;
 }
 
-body > svg { width: 0; height: 0; position: absolute; }
-.app-shell { width: min(940px, 100%); padding: 0; }
-.workspace { grid-template-columns: minmax(250px, 320px) minmax(280px, 360px); justify-content: center; gap: clamp(56px, 10vw, 130px); min-height: 100vh; }
-.controls-panel { font-family: "Gochi Hand", cursive; }
-.control-heading, .control-group > label, .label-row, .hint, .export-button { font-family: "Gochi Hand", cursive; letter-spacing: 0; text-transform: none; }
-.control-heading, .control-group > label, .label-row { font-size: 18px; }
-.upload-button, .emoji-chip { font-family: "Gochi Hand", cursive; box-shadow: none; }
-.upload-button { padding: 8px 11px; }
-.upload-button:hover { transform: none; box-shadow: none; }
-.control-group { border-color: #b8b8b8; }
-textarea { font-size: 28px; }
-.hint { font-size: 15px; }
-.export-button { box-shadow: none; font-size: 20px; text-transform: none; }
-.export-button:hover { transform: none; box-shadow: none; }
+.app-shell { position: relative; z-index: 1; width: min(940px, 100%); padding: 0; }
+.app-title { display: flex; align-items: baseline; gap: 13px; width: min(700px, 100%); margin: 0 auto 22px; padding-bottom: 14px; border-bottom: 2px solid var(--pink); color: var(--ink); }
+.app-title h1 { margin: 0; font: 700 40px/1 "Kanit", sans-serif; letter-spacing: 0; }
+.app-title-mark { font: 58px/.8 "Noto Emoji", sans-serif; transform: rotate(8deg); }
+.app-title p { margin: 0 0 2px auto; color: var(--pink); font: 400 16px/1 "Kanit", sans-serif; }
+.corner-note { position: fixed; z-index: 0; display: grid; justify-items: center; gap: 2px; color: var(--ink); pointer-events: none; }
+.corner-note span { font: 58px/1 "Noto Emoji", sans-serif; filter: url('#noise'); }
+.corner-note p { margin: 0; font: 700 14px/1 "Kanit", sans-serif; }
+.corner-note-top { top: 8vh; right: clamp(18px, 5vw, 80px); transform: rotate(9deg); }
+.corner-note-bottom { bottom: 7vh; left: clamp(18px, 5vw, 80px); transform: rotate(-9deg); }
+.workspace { grid-template-columns: minmax(250px, 320px) minmax(280px, 360px); justify-content: center; gap: clamp(56px, 10vw, 130px); min-height: calc(100vh - 104px); }
+.controls-panel { font-family: "Kanit", sans-serif; }
+.control-heading, .control-group > label, .label-row, .hint, .export-button { font-family: "Kanit", sans-serif; letter-spacing: 0; text-transform: none; }
+.control-heading, .control-group > label, .label-row { font-size: 15px; font-weight: 700; }
+.upload-button, .emoji-chip { font-family: "Kanit", sans-serif; box-shadow: 2px 2px 0 var(--ink); }
+.upload-button { padding: 8px 11px; border: 2px solid var(--ink); background: var(--paper); box-shadow: 3px 3px 0 var(--pink); }
+.upload-button:hover { transform: translate(2px, 2px); box-shadow: none; }
+.control-group { border-color: var(--line); }
+textarea { font: 28px/1.1 "Gochi Hand", cursive; }
+.hint { font-size: 13px; }
+.export-button { border: 2px solid var(--ink); box-shadow: 4px 4px 0 var(--pink); font-size: 16px; text-transform: none; }
+.export-button:hover { transform: translate(3px, 3px); box-shadow: none; }
+.export-actions { display: grid; gap: 10px; }
+.animated-export-button { display: flex; justify-content: space-between; align-items: center; width: 100%; padding: 11px 14px; border: 2px solid var(--ink); color: var(--ink); background: var(--paper); box-shadow: 3px 3px 0 var(--ink); font: 700 14px/1 "Kanit", sans-serif; }
+.animated-export-button:hover { transform: translate(3px, 3px); box-shadow: none; }
+.animated-export-button:disabled { cursor: wait; opacity: .7; }
+.emoji-palette button, .emoji-results button { display: grid; width: clamp(36px, 3vw, 44px); height: clamp(36px, 3vw, 44px); padding: 0; border: 2px solid var(--ink); background: var(--paper); place-items: center; font: clamp(20px, 1.7vw, 26px)/1 "Noto Emoji", "Segoe UI Symbol", sans-serif; font-variant-emoji: text; transition: transform .16s ease, background-color .16s ease; }
+.emoji-palette button:hover, .emoji-palette button:focus-visible { border-color: var(--pink); background: var(--sun); transform: translateY(-2px) rotate(-3deg); }
+.emoji-search { display: grid; gap: 5px; margin: 11px 0; }
+.emoji-search label { font-size: 15px; }
+.emoji-search input { width: 100%; padding: 8px 10px; border: 2px dashed var(--ink); outline: none; color: var(--ink); background: var(--paper); }
+.emoji-search input:focus { border-style: solid; box-shadow: 3px 3px 0 var(--pink); }
+.emoji-packs { display: flex; flex-wrap: wrap; gap: 5px; }
+.emoji-packs button { padding: 4px 8px; border: 2px solid var(--ink); color: var(--ink); background: var(--paper); font: 700 12px/1 "Kanit", sans-serif; }
+.emoji-packs button:hover, .emoji-packs button:focus-visible, .emoji-packs button.active { color: white; background: var(--pink); }
+.emoji-results { display: flex; flex-wrap: wrap; min-height: 0; gap: 5px; color: #716f68; font-size: 14px; line-height: 1.2; }
+.emoji-results button:hover, .emoji-results button:focus-visible { background: var(--sun); transform: translateY(-2px) rotate(3deg); }
+.swatch-powder-petal { --swatch: #eddcd2; }
+.swatch-light-cyan { --swatch: #c5dedd; }
+.swatch-powder-blue { --swatch: #99c1de; }
+.custom-color { display: grid; grid-template-columns: 1fr 38px 88px; align-items: center; gap: 7px; padding-top: 4px; font-size: 15px; }
+.custom-color input[type="color"] { width: 38px; height: 28px; padding: 2px; border: 2px solid var(--ink); background: var(--paper); cursor: pointer; }
+.custom-color input[type="text"] { width: 100%; padding: 5px 7px; border: 2px solid var(--ink); outline: none; color: var(--ink); background: var(--paper); font: 14px/1 "Kanit", sans-serif; text-transform: uppercase; }
+.custom-color input[type="text"]:focus { box-shadow: 2px 2px 0 var(--pink); }
 
 .preview-stage { display: block; }
+.export-area { padding: 100px; margin: -100px; }
 .frame {
   flex-shrink: 0;
   width: clamp(280px, 30vw, 360px);
   aspect-ratio: 4 / 5;
   padding: 24px;
-  transform: rotate(-6deg);
-  background-color: #f9f7f5;
-  box-shadow: 2px 2px 12px #0003;
+  border: 2px solid var(--ink);
+  transform: rotate(-4deg);
+  background-color: var(--paper);
+  box-shadow: 5px 5px 0 var(--ink);
 }
-.photo-wrap { aspect-ratio: 1 / 1; overflow: visible; background: transparent; }
-.photo-wrap::after { box-shadow: inset 2px 2px 4px #0007, inset -1px -1px 4px #0003; }
-#preview-image { filter: contrast(1.2) brightness(.9); }
+.photo-wrap { aspect-ratio: 1 / 1; overflow: hidden; background: transparent; }
+.photo-placeholder[hidden] { display: none; }
+.photo-wrap::after { box-shadow: none; }
+#preview-image { filter: none; }
 .quote-preview { margin: 0; padding-top: 30px; font-size: clamp(28px, 3vw, 36px); min-height: 0; }
 .emoji-layer { filter: url('#noise'); font-family: "Noto Emoji", sans-serif; font-size: clamp(60px, 6.5vw, 80px); }
 .emoji {
@@ -145,6 +203,21 @@ textarea { font-size: 28px; }
   font-size: 1em;
 }
 .emoji.selected { outline: 1px dashed #222; background: transparent; }
+.emoji-handle { position: absolute; z-index: 4; display: grid; width: 30px; height: 30px; padding: 0; border: 2px solid var(--ink); background: var(--paper); color: var(--ink); place-items: center; font: 700 16px/1 "Kanit", sans-serif; touch-action: none; }
+.emoji-handle:hover, .emoji-handle:focus-visible { background: var(--pink); }
+.emoji-handle-resize { right: -21px; bottom: -21px; cursor: nwse-resize; }
+.emoji-handle-rotate { top: -35px; left: 50%; cursor: grab; transform: translateX(-50%); }
+.emoji-handle-delete { top: -21px; right: -21px; cursor: pointer; }
+.emoji-handle-rotate::after { content: ""; position: absolute; top: 28px; left: 50%; width: 2px; height: 7px; background: var(--ink); transform: translateX(-50%); }
+.emoji-color-controls { position: absolute; z-index: 5; top: calc(100% + 15px); left: 50%; display: flex; align-items: center; gap: 3px; padding: 4px; border: 2px solid var(--ink); background: var(--paper); transform: translateX(-50%); }
+.emoji-color-swatch { width: 18px; height: 18px; padding: 0; border: 1px solid var(--ink); background: var(--swatch); cursor: pointer; }
+.emoji-custom-color-button { position: relative; display: grid; width: 24px; height: 24px; overflow: hidden; border: 2px solid var(--ink); background: var(--pink); box-shadow: 1px 1px 0 var(--ink); place-items: center; color: var(--ink); font: 18px/1 "Noto Emoji", sans-serif; cursor: pointer; }
+.emoji-custom-color-button:hover { transform: rotate(8deg) scale(1.05); }
+.emoji-custom-color { position: absolute; inset: 0; width: 100%; height: 100%; padding: 0; border: 0; opacity: 0; cursor: pointer; }
+.export-area.is-exporting .emoji-handle { display: none; }
+.export-area.is-exporting .emoji-color-controls { display: none; }
+.export-area.is-exporting .emoji.selected { outline: 0; }
+.site-footer { width: min(700px, 100%); margin: 18px auto 0; padding: 10px 0 0; border-top: 2px solid var(--pink); color: var(--ink); font: 14px/1 "Kanit", sans-serif; text-align: right; }
 .emoji-0 { font-size: .7em; transform: rotate(-10deg); }
 .emoji-1 { font-size: 1.2em; }
 .emoji-2 { font-size: 1.2em; transform: rotate(-10deg); }
@@ -164,7 +237,23 @@ textarea { font-size: 28px; }
 
 @media (max-width: 760px) {
   body { padding: 28px 20px; }
+  .app-title { width: min(520px, 100%); margin-bottom: 16px; }
+  .app-title h1 { font-size: 40px; }
+  .app-title-mark { font-size: 48px; }
+  .app-title p { font-size: 14px; }
+  .site-footer { width: min(520px, 100%); }
   .workspace { grid-template-columns: 1fr; gap: 66px; padding: 38px 0; }
   .preview-stage { order: 1; justify-self: center; }
   .controls-panel { order: 2; }
+}
+
+@media (max-width: 980px) {
+  .corner-note { display: none; }
+}
+
+@media (min-width: 1000px) {
+  .corner-note span { font-size: clamp(82px, 7vw, 112px); }
+  .corner-note p { font-size: 22px; }
+  .corner-note-top { top: 10vh; right: clamp(36px, 7vw, 140px); }
+  .corner-note-bottom { bottom: 9vh; left: clamp(36px, 7vw, 140px); }
 }

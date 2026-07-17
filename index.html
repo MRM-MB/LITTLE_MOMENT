@@ -3,11 +3,12 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <meta name="theme-color" content="#efeee8" />
-    <title>Little Frame</title>
+    <meta name="theme-color" content="#dbe7e4" />
+    <title>Little Moment | Manish</title>
+    <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Ctext x='32' y='47' text-anchor='middle' font-size='48'%3E%E2%9C%A8%3C/text%3E%3C/svg%3E" />
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <link href="https://fonts.googleapis.com/css2?family=Gochi+Hand&family=Noto+Emoji:wght@300..700&display=swap" rel="stylesheet" />
+    <link href="https://fonts.googleapis.com/css2?family=Gochi+Hand&family=Kanit:wght@400;700&family=Noto+Emoji:wght@300..700&display=swap" rel="stylesheet" />
     <link rel="stylesheet" href="styles.css" />
   </head>
   <body>
@@ -19,7 +20,20 @@
         <feDisplacementMap in="SourceGraphic" in2="noise" scale="2.5" xChannelSelector="R" yChannelSelector="G" />
       </filter>
     </svg>
+    <div class="corner-note corner-note-top" aria-hidden="true">
+      <span>🫧</span>
+      <p>save a feeling</p>
+    </div>
+    <div class="corner-note corner-note-bottom" aria-hidden="true">
+      <span>😗</span>
+      <p>make it yours</p>
+    </div>
     <main class="app-shell">
+      <header class="app-title" aria-label="Little Moment">
+        <span class="app-title-mark">✨</span>
+        <h1>little moment</h1>
+        <p>keep the feeling</p>
+      </header>
       <section class="workspace" aria-label="Frame editor">
         <aside class="controls-panel">
           <div class="control-heading">
@@ -41,34 +55,71 @@
           <div class="control-group emoji-control">
             <div class="label-row">
               <label for="emoji-input">Emojis</label>
-              <span id="emoji-count">0 / 8</span>
+              <span id="emoji-count">0</span>
+            </div>
+            <div id="emoji-palette" class="emoji-palette" aria-label="Emoji palette">
+              <button type="button" data-emoji="💖">💖</button>
+              <button type="button" data-emoji="🫶">🫶</button>
+              <button type="button" data-emoji="🎀">🎀</button>
+              <button type="button" data-emoji="✨">✨</button>
+              <button type="button" data-emoji="😘">😘</button>
+              <button type="button" data-emoji="😏">😏</button>
+              <button type="button" data-emoji="🫦">🫦</button>
+              <button type="button" data-emoji="😗">😗</button>
+              <button type="button" data-emoji="🌺">🌺</button>
+              <button type="button" data-emoji="🦋">🦋</button>
+              <button type="button" data-emoji="🌙">🌙</button>
+              <button type="button" data-emoji="🧚">🧚</button>
+              <button type="button" data-emoji="💃">💃</button>
+              <button type="button" data-emoji="🪩">🪩</button>
+              <button type="button" data-emoji="🍹">🍹</button>
+              <button type="button" data-emoji="🎉">🎉</button>
+              <button type="button" data-emoji="💀">💀</button>
+              <button type="button" data-emoji="👹">👹</button>
+            </div>
+            <div class="emoji-search">
+              <label for="emoji-search">Find an emoji</label>
+              <input id="emoji-search" type="search" placeholder="try moon, flower, coffee..." autocomplete="off" />
+              <div class="emoji-packs" aria-label="Emoji theme packs">
+                <button type="button" data-pack="halloween">Halloween</button>
+                <button type="button" data-pack="christmas">Christmas</button>
+                <button type="button" data-pack="valentines">Valentine's</button>
+                <button type="button" data-pack="thanksgiving">Thanksgiving</button>
+                <button type="button" data-pack="summer">Summer</button>
+              </div>
+              <div id="emoji-results" class="emoji-results" aria-live="polite"></div>
             </div>
             <div class="emoji-entry">
               <input id="emoji-input" type="text" maxlength="16" placeholder="paste an emoji" aria-label="Emoji to add" />
               <button id="add-emoji" class="icon-button" type="button" aria-label="Add emoji" title="Add emoji">+</button>
             </div>
-            <p class="hint">Tap an emoji in the preview to select it, then drag it around.</p>
-            <div id="emoji-list" class="emoji-list" aria-label="Added emojis"></div>
+            <p class="hint">Choose one here or add your own. Drag an emoji in the preview to move it.</p>
           </div>
 
-          <button id="export-button" class="export-button" type="button">Export transparent PNG <span>↗</span></button>
+          <div class="export-actions">
+            <button id="export-button" class="export-button" type="button">Export PNG <span>↗</span></button>
+          </div>
         </aside>
 
         <div class="preview-stage">
-          <div id="frame" class="frame" aria-label="Your shareable frame preview">
-            <div class="photo-wrap">
-              <img id="preview-image" alt="Your uploaded image" />
-              <div class="photo-placeholder" id="photo-placeholder">
-                <span>pick a photo</span>
-                <small>your memory goes here</small>
+          <div id="export-area" class="export-area">
+            <div id="frame" class="frame" aria-label="Your shareable frame preview">
+              <div class="photo-wrap">
+                <img id="preview-image" alt="Your uploaded image" />
+                <div class="photo-placeholder" id="photo-placeholder">
+                  <span>pick a photo</span>
+                  <small>your memory goes here</small>
+                </div>
               </div>
+              <p id="quote-preview" class="quote-preview">a little moment</p>
+              <div id="emoji-layer" class="emoji-layer" aria-label="Emoji decorations"></div>
             </div>
-            <p id="quote-preview" class="quote-preview">a little moment</p>
-            <div id="emoji-layer" class="emoji-layer" aria-label="Emoji decorations"></div>
           </div>
         </div>
       </section>
+      <footer class="site-footer"><span id="copyright"></span></footer>
     </main>
+    <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
     <script src="app.js"></script>
   </body>
 </html>
