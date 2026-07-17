@@ -44,7 +44,3 @@ LITTLE_MOMENT/
 ├── styles.css
 └── README.md
 ```
-
-## Publish With GitHub Pages
-
-After pushing the project to GitHub, open **Settings > Pages**, choose **Deploy from a branch**, then select `main` and `/(root)`. GitHub will provide the public site URL after deployment.
