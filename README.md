@@ -30,6 +30,10 @@ py -m http.server 4173
 
 Then open `http://localhost:4173`.
 
+## 👥 Contribute
+
+Contributions are welcome. Please read [CONTRIBUTING.md](CONTRIBUTING.md) before opening a pull request.
+
 ## 📁 Folder Structure
 
 ```plaintext
@@ -40,7 +44,13 @@ LITTLE_MOMENT/
 |       └── little-moment-editor.png
 |
 ├── app.js
+├── CONTRIBUTING.md
 ├── index.html
+├── LICENSE
 ├── styles.css
 └── README.md
 ```
+
+## License
+
+Released under the [MIT License](LICENSE).
