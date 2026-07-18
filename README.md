@@ -1,4 +1,4 @@
-# Little Moment ✨
+# ✨ Little Moment
 
 **Little Moment** is a browser-only photo-frame editor for turning an image, a handwritten note, and expressive emoji decorations into a shareable PNG.
 
